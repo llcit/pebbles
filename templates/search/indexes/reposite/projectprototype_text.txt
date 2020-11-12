@@ -1,0 +1,7 @@
+{{ object.title }}
+{{ object.description }}
+{{ object.creator.first_name }}
+{{ object.creator.last_name }}
+{{ object.creator.email }}
+{{ object.origin }}
+{{ object.get_data_dict }}

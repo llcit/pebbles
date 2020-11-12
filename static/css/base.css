@@ -1,0 +1,94 @@
+/*base.css*/
+
+body {
+  padding-top: 80px;
+  padding-bottom: 75px;
+  font-family: 'Roboto', 'Open Sans Condensed', sans-serif;
+}
+
+.static_a_display:link {color: #000; text-decoration: none;}
+.static_a_display:visited {color: #000; text-decoration: none;}
+.static_a_display:hover {color: #666; text-decoration: none;}
+.static_a_display:active {color: #000; text-decoration: none;}
+
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    color:black;
+    background-color:#fff;
+    border: 1px solid #ccc;
+    }
+
+.label-ltgray { background-color: #eee; color: black; }
+
+.header {
+    background-color: white;
+    height: 80px;
+    border: none;
+}
+
+.header img {
+    height: 60px;
+}
+
+
+dt { white-space: normal; }
+
+.brick { width: 250px; }
+.subbrick { width: 200px; overflow-x: nowrap; }
+
+.stamp {
+  position: relative;
+  width: 800px;
+  height: 300px;
+  /*left: 0%;
+  top: 10px;*/
+  background: #fff;
+  /*border: 4px dotted black;*/
+}
+
+.block {
+    /*position: relative;*/
+    width: 250px;
+    /*float: left;*/
+    /*margin: 5px*/
+}
+
+.blocks-wide {
+    position: relative;
+    width: 40%;
+    float: left;
+    margin: 10px;
+    padding: 20px;
+}
+
+/*COLORS*/
+/*bootstraps light green = #dff0d8*/
+
+.bs-bg-light-green { background: #dff0d8; }
+.bs-bg-white { background: #fff; }
+
+.badge-important{background-color: orange; color: black;}
+
+.popover {width: 200px; background-color: #303030; color: white; font-size: 1.2em;}
+
+
+.btn-color-flat-border {
+    color: black;
+    border: 1px solid gray; 
+}
+
+.btn-color-flat {
+    color: black;  
+}
+.btn-color-flat:hover {color: #666; text-decoration: none; border: 1px solid gray;}
+
+.query-term {
+    font-size: 1.2em;
+    color: green;
+    text-decoration: none;
+    border-bottom: 4px solid green;
+}
+
+/*.nav-pills>li.active>a { background-color: #dff0d8; color: black; }
+.nav-pills>li>a { background-color: #eee; }
+*/

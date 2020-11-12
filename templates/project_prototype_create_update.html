@@ -1,0 +1,204 @@
+<!-- project_prototype_create.html -->
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load form_utils %}
+
+{% block content_container %}
+
+<div class="row">
+
+    
+    <div class="col-xs-10 col-xs-offset-1">
+        {% if project_prototype %}<p>
+        <i class="fa fa-angle-left"></i><i class="fa fa-angle-left"></i> <a href="{% url 'docview_prototype' project_prototype.id %}" class="static_a_display">{{ project_prototype }} </a>
+        </p>{% endif %}
+        <h4 class="lead">
+            {% if project_prototype %} Modify {{ project_prototype }} {% else %} Create a New Project {% endif %}
+            {% if project_prototype %}
+            <a href="{% url 'view_all_tasks' project_prototype.id %}" class="static_a_display">
+                <button class="btn btn-xs"><i class="fa fa-pencil"></i> edit/add project tasks </button>
+            </a>
+            {% endif %}
+            
+        </h4>
+    </div>
+
+</div>
+<div class="row">
+    
+    <!-- Project property selector -->
+    <div class="col-xs-2 col-xs-offset-1 block-center">
+        <ul id="form_sects" class="nav nav-pills nav-stacked" role="tablist">
+            
+            {% for tab in form.Meta.label_groups %}
+                <li role="presentation" class="{% if forloop.first %}active{% endif %}">
+                    <a href="#{{ tab|slugify }}" class="static_a_display" aria-controls="{{ tab|slugify }}" role="tab" data-toggle="tab">
+                        <h5><span class="error_indicator"></span> {{ tab }} <span class="pull-right"><i class="fa fa-caret-right"></i></span></h5>
+                    </a>
+                </li>
+                {% if forloop.first %}<li><hr><h6>Additional Properties</h6></li>{% endif %}
+            {% endfor %}
+            <li role="presentation">
+                <a href="#filebrowser" data-toggle="tab" role="tab" aria-expanded="false" aria-controls="filebrowser" class="static_a_display">Browse project files</a>
+            </li>
+            <li><button id="savebtn" type="submit" class="savebtn btn btn-md btn-success btn-block">Save Project</button></li>
+        </ul>
+    </div>
+
+    <!-- Project property forms -->
+    <div class="col-xs-8 block-center">
+        <form id="projectform" method="post" action="" class="form-horizontal" enctype="multipart/form-data">{% csrf_token %}
+            {% for hidden in form.hidden_fields %} {{hidden}} {% endfor %}
+            <!-- Tabs container -->
+            <div class="tab-content clearfix">
+            {% for f in form.visible_fields %}
+                <!-- Detect change in form section to generate a new section (tab)-->
+                {% ifchanged f.label %}
+                    {% if not forloop.first %}</div>{% endif %}
+                    <div role="tabpanel" class="tab-pane {% if forloop.first %}active{% endif %}" id="{{f.label|slugify}}">
+                    <h3>{{f.label}}</h3>
+                {% endifchanged %}
+                <div class="row form-group"><!-- Begin form row -->
+
+                <!-- Determine what kind of input selection we need to render, opts = single choice or multiple choice -->
+
+                <!-- Single value form field -->
+                {% if f|length == 1 %}
+                    <div class="col-md-2 {% if f.errors %}badge-important{% endif %}">
+                        <h4>
+                            {{ f.field.label_suffix }} {% if f.field.required %}<small class="">*required</small>{% endif %}
+                        </h4>
+                        <small>{{ f.help_text }}</small>
+                        <ul class="list-unstyled">{% for e in f.errors %} <li class="error"><strong>{{ e }}</strong></li> {% endfor %} </ul>
+                    </div>
+                    <div class="col-md-10" id="{{f.field.label_suffix|slugify}}" data-container="#{{f.field.label_suffix|slugify}}" data-toggle="popover" data-content="{% for message in messages %}{{message}}{% endfor %}" data-placement="top">{{ f }}</div>
+
+                <!-- OR Multivalue form field -->
+                {% else %}
+                    <div class="col-md-2 {% if f.errors %}badge-important{% endif %}">
+                        <h4>
+                            {{ f.field.label_suffix }} {% if f.field.required %}<small class="">*required</small>{% endif %}
+                        </h4>
+                        <small>{{ f.help_text }}</small>
+                        <ul class="list-unstyled">{% for e in f.errors %} <li class="error"><strong>{{ e }}</strong></li> {% endfor %} </ul>
+                    </div>
+
+                    <div class="col-md-10 data_input">
+                        {% if f|is_multiple %}
+                            {% if f|length > 50 %}
+                                <div class="option_toggle">
+                                    <a class="static_a_display btn bg-success" data-toggle="collapse" href="#form_{{f.field.label_suffix|slugify}}" aria-expanded="false" aria-controls="form_{{f.field.label_suffix|slugify}}">
+                                        Click to view {% if f.value %}more{% endif %} options <i class="fa fa-caret-right"></i>
+                                    </a>
+                                    <div class="selected">{% for selected in f.value %} {{ selected }}, {% endfor %}</div>
+                                </div>
+
+                                <div id="form_{{f.field.label_suffix|slugify}}" class="collapse">
+                                
+                                {% if f|is_multiple %}
+                                    <label class="btn btn-sm btn-default"><input id="{{f.0.name}}" type="checkbox" class="selectall" data-value="{{ f.field.widget.attrs.data_value }}"> Select all</label>
+                                {% endif %}
+
+                                <ul class="list-unstyled list-inline">
+                                    {% for choice in f %}<li class="selector col-xs-12 col-sm-6 col-md-4 ">{{ choice }}</li>{% endfor %}
+                                </ul>
+                                </div>
+                            {% else %}
+                                
+                                {% if f|is_multiple %}
+                                    <label class="btn btn-sm btn-default"><input id="" type="checkbox" class="selectall" data-value="{{ f.field.widget.attrs.data_value }}"> Select all</label>
+                                {% endif %}
+
+                                <ul class="list-unstyled list-inline">
+                                    {% for choice in f %}{{choice.items.name}} <li class="selector col-xs-12 col-sm-6 col-md-4 ">{{ choice }}</li>{% endfor %}
+                                </ul>
+                            {% endif %}
+
+                        {% else %}
+
+                            <ul class="list-unstyled list-inline">
+                                {% for choice in f %}<li class="selector col-xs-12 col-sm-6 col-md-4 ">{{ choice }}</li>{% endfor %}
+                            </ul>
+
+                        {% endif %}
+
+                    </div>
+                {% endif %}
+                </div> <!-- End form row -->
+            {% endfor %}
+                </div> <!--  Closing Tab section -->
+
+
+                <!-- File Browser Tab content -->
+                
+                <div class="tab-pane" id="filebrowser" id="filebroswer">
+                    {% if project_prototype %}
+                    <div><a href="{% url 'upload_file' project_prototype.id %}" class="static_a_display btn btn-xs btn-default">Upload a new project file</a></div>
+                    {% else %}
+                    <div>Please create and save your project before adding files. </div>
+                    {% endif %}
+                    <div>{% include "file_listing_template.html" %}</div>
+
+                </div>
+                
+
+            </div><!-- End Tabs container -->
+
+        </form>
+    </div>
+
+</div>
+
+{% endblock content_container %}
+
+{% block js_include %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".savebtn").on("click", function(e) {
+            $("#projectform").submit()
+        });
+
+        // Handle the select all checkbox for various fields
+        $(".selectall").click(function(){
+            console.log($(this).attr("data-value"));
+            $("input[name="+$(this).attr("data-value")+"]").prop( "checked", $(this).is(':checked') )
+        });
+
+        // User has clicked on single checkbox in a field
+        $(".selector").find("input").click(function(){
+            var field_container = $(this).parents(".data_input")
+            var selected_display = $(field_container).find(".selected");
+
+            // This resets selections in the selected label.
+            $(selected_display).html("");
+            $(field_container).find("input:checkbox:checked").each(function () {
+                $(selected_display).append($(this).val() + ", ");
+            });
+
+            // This clears the select all checkbox.
+            $("#"+$(this).attr("name")).prop( "checked", false);
+        });
+
+        $(".tab").each(function () {
+            // This gathers any form errors loaded from each tab section.
+            // The tab section is id'd in the attribute: aria-controls
+
+            target = $("#"+$(this).attr("aria-controls"));
+            elist = $(target).find("li.error");
+
+            if(elist.length) {
+                $(this).find(".error_indicator").html("<span class='badge badge-important'>"+  elist.length + "</span>");
+            }
+
+        });
+
+
+        $("#project-title").popover("show");
+
+        $("body").on("click", function () {
+            $("#project-title").popover("hide");
+        })
+    });
+</script>
+{% endblock js_include %}
+

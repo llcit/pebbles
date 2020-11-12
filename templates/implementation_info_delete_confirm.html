@@ -1,0 +1,19 @@
+<!-- task_delete_confirm.html -->
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content_container %}
+
+<div class="row"><div class="col-md-8 col-md-offset-2 block-center">
+    <p class="lead">
+        <form method="post" action=".">{% csrf_token %}
+            <p class="lead well" style="background: orange">
+                This action will permanently remove <strong>{{ information_item }}</strong> from the <strong>{{ information_item.prototype_project }}</strong> project.
+            </p>
+            <button type="submit" class="btn btn-lg btn-danger">Yes, I want to permanently delete implementation info {{ information_item }} now!</button>
+        </form>
+    </p>
+</div></div>
+
+
+{% endblock content_container %}

@@ -1,0 +1,146 @@
+<!-- project_prototype_detail.html -->
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content_container %}
+
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">
+         <p class="lead">
+            <h2>
+                {% if project_prototype.icon %}<span><img src="{{ project_prototype.icon.url }}" height="50px"></span>{% endif %}
+                {{ project_prototype.title }}
+                <small> by {{ project_prototype.creator.first_name }} {{ project_prototype.creator.last_name }}</small>
+                {% if project_prototype.origin %}
+                <small> derived from <a href="{% url 'view_prototype' project_prototype.origin.id %}">{{ project_prototype.origin }}</a></small>
+                {% endif %}
+            </h2>
+            
+            <a href="{% url 'docview_prototype' project_prototype.id %}" class="static_a_display">
+                <button class="btn btn-xs"><i class="fa fa-file-text-o"></i> view</button>
+            </a>
+
+            {% comment %}
+            <a href="{% url 'flip_prototype' project_prototype.id %}" class="static_a_display">
+                <button class="btn btn-xs"><i class="fa fa-files-o"></i> flip</button>
+            </a>
+            {% endcomment %}
+
+            {% if user == project_prototype.creator or request.user.is_staff %}
+
+                <a href="{% url 'update_prototype' project_prototype.id %}"class="static_a_display">
+                    <button class="btn btn-xs"><i class="fa fa-pencil"></i> edit</button>
+                </a>
+
+                {% if not project_prototype.flips.all %}
+                <a href="{% url 'delete_prototype' project_prototype.id %}" class="static_a_display">
+                    <button class="btn btn-xs"><i class="fa fa-close"></i> remove</button>
+                </a>
+                {% else %}
+                <a href="" class="static_a_display">
+                    <button class="btn btn-xs"><i class="fa fa-close"></i> Cannot remove because there are multiple derivations</button>
+                </a>
+                {% endif %}
+            {% endif %}
+        </p>
+        <p class="small"><em>created on</em> {{ project_prototype.created|date:'M d, Y' }} <em>modified on</em> {{ project_prototype.modified|date:'M d, Y h:i' }}</p>
+
+
+        <dl class="dl-horizontal">
+            <dt>description:</dt> <dd><span> {{ project_prototype.description|safe }} </span></dd>
+            <dt>publisher:</dt><dd><span> {{ project_prototype.publisher }} </span></dd>
+            <dt>publish_date:</dt><dd><span> {{ project_prototype.publish_date }} </span></dd>
+            <dt>contributors:</dt><dd><span> {{ project_prototype.contributors }} </span></dd>
+            <dt>copyright:</dt><dd><span> {{ project_prototype.rights }} </span></dd>
+            <dt>uri:</dt><dd><span> {{ project_prototype.uri }} </span></dd>
+        </dl>
+    </div>
+    
+    <hr>
+    <!-- COLUMN 1 -->
+    <div class="col-md-4 col-md-offset-1">        
+        <dl class="dl-horizontal">
+            <h4>Language{{ prototype_data.language.length|pluralize }}: <small>{% for i in prototype_data.language %} {{ i.1 }}{% if not forloop.last %}, {% endif %} {% endfor %}</small></h4>
+            <hr>
+        
+            <h4>Subject Area(s): <small>{% for i in prototype_data.subject %} {{ i.1 }}{% if not forloop.last %}, {% endif %}{% endfor %}</small></h4>
+
+            <hr>
+
+            <h4>Instructional Context</h4>
+            <hr>
+            {% for i in prototype_data.instructional_context %} 
+                {% ifchanged i.0 %}<h2></h2><dt> {{ i.0 }}: </dt>{% endifchanged %} 
+                <dd class="">{{ i.1 }}</dd>
+            {% empty %}
+                <h5>not specified</h5>
+            {% endfor %}
+        </dl>            
+    </div>
+
+    <!-- COLUMN 2 -->
+    <div class="col-md-4 col-md-offset-1">
+        <dl class="dl-horizontal">
+            <h4>Language Proficiency</h4>
+            <hr>
+            {% for i in prototype_data.language_proficiency %} 
+                {% ifchanged i.0 %}<h2></h2><dt> {{ i.0 }}: </dt>{% endifchanged %} 
+                <span class="badge"> {{ i.1 }}</span>
+            {% empty %}
+                <h5>not specified</h5>
+            {% endfor %}
+            <hr>
+        
+            <h4>World Readiness Standards</h4>
+            <hr>
+            {% for i in prototype_data.world_readiness %} 
+                {% ifchanged i.0 %}<h2></h2><dt> {{ i.0 }} </dt>{% endifchanged %} 
+                <dd class="">{{ i.1 }}</dd>
+            {% empty %}
+                <h5>not specified</h5>
+            {% endfor %}
+            <hr>
+
+            <h4>21<sup>st</sup> Century Skills</h4>
+            <hr>
+            {% for i in prototype_data.21st_century_skills %} 
+                {% ifchanged i.0 %}<h2></h2><dt> {{ i.0 }} </dt>{% endifchanged %} 
+                <dd class="">{{ i.1 }}</dd>
+            {% empty %}
+                <h5>not specified</h5>
+            {% endfor %}
+        </dl>
+    </div>
+
+    <div class="col-md-10 col-md-offset-1">
+        <dl>
+            <!-- PROJECT SEQUENCE OVERVIEW TABLE OF CONTENTS -->
+            <dt id="project_sequence" class="lead"><h2>Project Sequence Overview</h2></dt>
+            <dd>
+                {% for category, tasks in prototype_tasks.items %}
+                    <h3>{{ category }}</h3>
+                    {% for task in tasks %}
+                        <p>
+                            <span>{{ forloop.counter }}.</span> {{ task.title }} - <em>{{ task.short_description }}</em>
+                            <a href="{% url 'view_task' project_prototype.id task.id %}">more detail</a>
+                        </p>
+                    {% endfor %}
+                {% endfor %}
+            </dd>
+        </dl>
+    </div>
+</div>
+{% endblock content_container %}
+
+{% block js_include %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".addatask").popover("show");
+
+
+        $("body").on("click", function () {
+            $(".addatask").popover("hide");
+        })
+    });
+</script>
+{% endblock js_include %}

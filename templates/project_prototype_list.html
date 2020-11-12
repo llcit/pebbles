@@ -1,0 +1,132 @@
+<!-- project_prototype_list.html -->
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content_container %}
+
+<div class="row"><div class="col-md-10 col-md-offset-1 block-center">
+    <p class="lead">
+        <span class="">{{ prototype_list|length }}</span> Prototype{{prototype_list|length|pluralize }} in the repository
+    </p>
+    <p>
+        <a href="{% url 'create_prototype' %}" class="static_a_display"><button class=" btn btn-xs btn-success"><i class="fa fa-plus"></i> create </button></a> your very own OR <button class="btn btn-xs disabled"><i class="fa fa-files-o"></i> flip </i></button> an existing one!</i>
+    </p>
+
+    <hr height="5">
+</div></div>
+
+<div class="row"><div class="col-md-10 col-md-offset-1 block-center">   
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-sm btn-link dropdown-toggle btn-color-flat static_a_display" data-toggle="dropdown"><i class="fa fa-filter"></i> <span id="toggle-label">language</span> </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" class="filterbtn" data-filter="*"> show all </a></li>
+            {% for k, v in languages.items %}
+                <li><a href="#" class="filterbtn" data-filter=".{{k}}"> {{ k }} ({{ v }}) </a></li>
+            {% endfor %}
+        </ul> 
+    </div>
+
+    <a href="#" class="sortbtn btn btn-sm btn-link btn-color-flat static_a_display" data-sort="lname"> <i class="fa fa-sort-alpha-desc"></i> author </a>
+
+    <a href="#" class="sortbtn btn btn-sm btn-link btn-color-flat static_a_display" data-sort="title"> <i class="fa fa-sort-alpha-desc"></i> title </a>
+
+    <a href="#" class="sortbtn btn btn-sm btn-link btn-color-flat static_a_display" data-sort="modified"><i class="fa fa-sort-alpha-asc"></i> modified </a>
+
+    <a href="#" class="filterbtn btn btn-sm btn-link btn-color-flat static_a_display" data-filter="*"> <i class="fa fa-refresh"></i> </a>
+    
+
+    {% if user.is_staff %}
+    <a href="#" class="sortbtn btn btn-sm btn-link btn-color-flat static_a_display" data-sort="active"> <i class="fa fa-sort-alpha-desc"></i> published </a>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    <div class="btn-group pull-right" role="group">
+        <button type="button" class="btn btn-sm btn-link dropdown-toggle btn-color-flat static_a_display" data-toggle="dropdown"><i class="fa fa-folder"></i> <span id="toggle-label">your prototypes</span> </button>
+        <ul class="dropdown-menu">
+            {% for user_prj in prototypes_by_creator %}
+                <li><a href="{% url 'docview_prototype' user_prj.pk %}">{{ user_prj }} </a></li>
+            {% endfor %}
+        </ul> 
+    </div>
+    {% endif %}
+    <hr height="2">
+</div></div>
+
+<div id="bricklist" class="row">
+    {% for project_prototype in prototype_list %} 
+        
+        <div class="col-md-10 col-md-offset-1 block-center item {% for k in project_prototype.0.get_languages %} {{ k }} {% endfor %}" data-title="{{project_prototype.0|slugify}}" data-mod="{{ project_prototype.0.modified|date:'Ymd' }}" data-active="{% if project_prototype.0.active %}active{% else %}inactive{% endif %}">
+
+            <p>               
+                <a href="{% url 'docview_prototype' project_prototype.0.id %}" class="static_a_display lead"> <i class="fa fa-file-text-o fa-1x"></i>
+                    {{ project_prototype.0.title }}
+                </a>
+                <span>by {{ project_prototype.0.creator.first_name }}</span> <span class="lname">{{ project_prototype.0.creator.last_name }}</span>
+                <span class="small"> {{ project_prototype.0.modified|date:'M j, Y' }} </span>
+
+                <a href="{% url 'view_prototype' project_prototype.0.id %}" class="static_a_display">
+                    <button class="btn btn-xs"><i class="fa fa-info"></i> info </i></button>
+                </a>
+
+                {% if project_prototype.0.creator == user %}
+                <a href="{% url 'update_prototype' project_prototype.0.id %}" class="static_a_display">
+                    <button class="btn btn-xs"><i class="fa fa-pencil"></i> edit</button>
+                </a>
+
+                <a href="{% url 'delete_prototype' project_prototype.0.id %}" class="static_a_display">
+                    <button class="btn btn-xs"><i class="fa fa-close"></i> remove</button>
+                </a>
+                {% endif %}
+                {% if not project_prototype.0.active %}<span class="label label-danger">unpublished</span>{% endif %}
+            </p>
+            {% if project_prototype.0.origin %}
+                <p> derived from <a href="{% url 'view_prototype' project_prototype.0.origin.id %}" class="static_a_display">{{ project_prototype.0.origin }}</a></p>
+            {% endif %}
+        </div>
+
+    {% endfor %}
+</div>
+
+{% endblock content_container %}
+
+{% block js_include %} 
+    <script type="text/javascript">
+        var $container = $('#bricklist');
+        $container.isotope({
+            itemSelector: '.item',
+
+            getSortData: {
+                lname: '.lname',
+                title: '[data-title]',
+                modified: '[data-mod]',
+                active: '[data-active]',
+            }
+        });
+
+        $('.sortbtn').on('click', function() {
+            var $v = $(this).attr('data-sort');
+            var $b = $(this).children('.fa');
+            if( $b.hasClass('fa-sort-alpha-desc') ) {
+                $container.isotope({ sortBy: $v, sortAscending: false });
+                $b.toggleClass('fa-sort-alpha-desc fa-sort-alpha-asc');
+                
+            } else {
+                $container.isotope({ sortBy: $v, sortAscending: true });
+                $b.toggleClass('fa-sort-alpha-desc fa-sort-alpha-asc');
+               
+            }
+        });
+
+        $('.filterbtn').on('click', function() {
+            var $v = $(this).attr('data-filter');
+            if($v !== "*")
+                $("#toggle-label").html($v.substring(1));
+            else 
+                $("#toggle-label").html("language");
+
+            $container.isotope({ filter: $v });
+        });
+
+        $container.isotope({ sortBy: 'modified', sortAscending: false });
+    </script>
+{% endblock js_include %}

@@ -1,0 +1,19 @@
+<!-- project_prototype_delete_confirm.html -->
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content_container %}
+
+<div class="row"><div class="col-md-8 col-md-offset-2 block-center">
+    <p class="lead">
+        <form method="post" action=".">{% csrf_token %}
+            <p class="lead well" style="background: orange">
+                This action will permanently remove the Project Prototype entitled <strong>{{ project_prototype }}</strong>. The only recourse for this action is to retrieve data from system backup which will make the IT person really grouchy! Maybe you'd rather <strong>deactivate</strong>? If so, you can edit <strong>{{ project_prototype }}</strong> <a href="{% url 'update_prototype' project_prototype.id %}">here</a>.
+            </p>
+            <button type="submit" class="btn btn-lg btn-danger">Yes, I want to permanently delete {{ project_prototype }} now!</button>
+        </form>
+    </p>
+</div></div>
+
+
+{% endblock content_container %}

@@ -1,0 +1,67 @@
+<!-- task_create_update.html -->
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block content_container %}
+
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        <p>
+        <i class="fa fa-angle-left"></i><i class="fa fa-angle-left"></i> <a href="{% url 'docview_prototype' prototype_project.id %}" class="static_a_display">{{ prototype_project }} </a>
+        <i class="fa fa-angle-left"></i><i class="fa fa-angle-left"></i> <a href="{% url 'view_all_tasks' prototype_project.id %}" class="static_a_display">Tasks</a>
+        </p>
+        <h4 class="lead">{{ edit_text|safe }}</h4>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 col-md-offset-1">
+        <div id="data">
+            {% for i, j in sequence_orders.items %}
+                <input type="hidden" id="{{ i }}" value="{{ j }}">
+            {% endfor %}
+        </div>
+
+        <form id="taskform" method="post" action=".">{% csrf_token %}
+            {{ form|crispy }}
+             <!-- workaround for nonfocusable tinymce widgets => submit handled by javascript below -->
+            <button id="savebtn" class="savebtn btn btn-lg btn-block btn-success">Save Task</button>
+        </form>
+    </div>
+
+    <div class="col-md-4 block-center">
+        <h4>
+        Uploaded Files      
+        {% if project_task %}
+        <span class="small" id="fileuploadbtn"><a href="{% url 'upload_task_file' project_task.pk %}" class="static_a_display"><button class="btn btn-sm">Upload a new file</button></a></span>
+        <div id="filebrowser">
+            <div>{% include "file_listing_template.html" %}</div>
+        </div>
+        {% else %}
+        <span class="small">Save your new task before adding files.</span>
+        {% endif %}
+        </h4>
+        
+
+    </div>
+</div>
+{% endblock content_container %}
+
+{% block js_include %}
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        $("#id_task_category").on("change", function(e) {
+            var cat = $("#id_task_category option:selected")[0].value;
+            var cur = $("#"+cat);
+            if (cur.length > 0){
+                $("#id_sequence_order").val(cur.val());
+            }            
+        });
+
+        $(".savebtn").on("click", function(e) {
+            $("#taskform").submit()
+        });
+    });
+</script>
+{% endblock js_include %}

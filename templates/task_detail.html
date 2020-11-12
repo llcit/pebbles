@@ -1,0 +1,153 @@
+<!-- task_detail.html -->
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block content_container %}
+
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        <p>
+        <i class="fa fa-angle-left"></i><i class="fa fa-angle-left"></i> <a href="{% url 'docview_prototype' prototype_project.id %}" class="static_a_display">{{ prototype_project }} </a>
+        </p>
+        <h4 class="lead">Tasks  
+            {% if user == prototype_project.creator or user_is_coeditor %}
+            
+            <a href="{% url 'create_task' prototype_project.id %}" class="static_a_display"><button class="btn btn-xs"><i class="fa fa-plus"></i> new task </button></a>
+            <a href="{% url 'create_implementation_item' prototype_project.id %}" class="static_a_display"><button class="btn btn-xs"><i class="fa fa-plus"></i> implementation info</button></a>
+      
+            {% endif %}
+        </h4>
+    </div>
+</div>
+
+<div class="row">
+<!-- Task selector -->
+
+    <div class="col-sm-4 col-sm-offset-1 block-center" role="tabpanel">
+        <ul class="nav nav-pills nav-stacked">
+        {% for i in task_list %}
+            {% ifchanged i.get_task_category_display %}
+                <li class=""><h4>{% if not i.get_task_category_display %}<small>No category specified</small>{% else %}{{ i.get_task_category_display }}{% endif %}</h4></li>
+            {% endifchanged %}
+
+            <li role="presentation" class="{% if i.id == project_task.id %}active{% endif %}">
+                <a href="#task_detail_{{i.id}}" aria-controls="task_detail_{{i.id}}" role="tab" data-toggle="tab" class="static_a_display">
+                    <h5><span>{{ forloop.counter }}. {{ i.title }}</span> <span class="pull-right"><i class="fa fa-caret-right"></i></span></h5>
+                    
+                </a>
+            </li>
+
+        {% empty %}
+            <li>No tasks have been created yet.</li>
+        {% endfor %}
+
+        {% if implementation_items %}<li><h4>Implementation Info</h4></li>{% endif %}
+        {% for i in implementation_items %}
+            <li role="presentation" class="">
+                <a href="#info_detail_{{i.id}}" aria-controls="info_detail_{{i.id}}" role="tab" data-toggle="tab" class="static_a_display">
+                    <h5><span>{{ forloop.counter }}. {{ i.title }}</span> <span class="pull-right"><i class="fa fa-caret-right"></i></span></h5>
+                </a>
+            </li>
+        {% empty %}
+
+        {% endfor %}
+        </ul>
+    </div>
+
+<!-- Task content display -->
+
+    <div class="col-sm-6 tab-content block-center">
+        {% for i in task_list %}
+        <div id="task_detail_{{i.id}}" class="tab-pane {% if i.id == project_task.id %}active{% endif %}" role="tabpanel"  >
+            {% if i.title %}
+                <h3>    
+                    <span class="" style="padding: 5px"><strong>{{ i.title }}</strong></span>
+                    {% if user == i.prototype_project.creator or user_is_coeditor %}
+                    <a href="{% url 'update_task' i.prototype_project.id i.id %}" class="static_a_display">
+                        <button class="btn btn-xs"><i class="fa fa-pencil"></i> edit</button>
+                    </a>
+
+                    <a href="{% url 'delete_task' i.prototype_project.id i.id %}" class="static_a_display">
+                        <button class="btn btn-xs"><i class="fa fa-close"></i> remove</button>
+                    </a>
+                    {% endif %}
+                </h3>
+
+            {% endif %}
+            <p><em> {{ i.short_description|safe }} </em></p>
+            <dl class="dl-horizontal">
+                {% if i.description|safe %}<dt>Task Description:</dt><dd> {{ i.description|safe }} </dd>{% endif %}
+                {% if i.task_type %}<dt>Task Type:</dt> <dd>{{ i.task_type }} </dd>{% endif %}
+                {% if i.task_focus %}<dt>Task Focus:</dt> <dd>{{ i.task_focus|safe }} </dd>{% endif %}
+                {% if i.task_time %}<dt>Task Time:</dt> <dd>{{ i.task_time }} </dd>{% endif %}
+                {% if i.task_extensions %}<dt>Task Extension:</dt> <dd>{{ i.task_extensions|safe }} </dd>{% endif %}
+                {% if i.technology_tips %}<dt>Technology Tips:</dt> <dd>{{ i.technology_tips|safe }} </dd>{% endif %}
+                {% if i.potential_hurdles %}<dt>Potential Hurdles:</dt> <dd>{{ i.potential_hurdles|safe }} </dd>{% endif %}
+            </dl>
+            
+            <p><strong>Files</strong>
+                {% if user == i.prototype_project.creator or user_is_coeditor %}
+                <a href="{% url 'upload_task_file' i.pk %}" class="static_a_display"><button class="btn btn-xs btn-success"><i class="fa fa-plus"></i> Add A File</button></a>
+                {% endif %}
+            </p>
+            {% for file in i.task_files.all %}
+            <div class="media">                
+                <div class="media-left media-top">
+                    <a href="{{ file.file.url }}" target="_blank">
+                        <img class="media-object" src="{{ file.file.url }}" alt="..." width="48px">
+                    </a>                    
+                </div>
+                <div class="media-body">                   
+                    <a href="{% url 'delete_task_file' file.id %}" class="static_a_display">
+                        <button type="button" class="btn btn btn-xs"><i class="fa fa-close"></i> remove</button>
+                    </a>                    
+                </div>
+            </div>
+            {% endfor %}  
+        </div>
+        {% endfor %}
+
+<!-- Implementation content display -->
+        {% for i in implementation_items %}
+         <div id="info_detail_{{i.id}}" class="tab-pane {% if i.id == project_task.id %}active{% endif %}" role="tabpanel">
+            <h3>    
+                <span class="" style="padding: 5px"><strong>{{ i.title }}</strong></span>
+                {% if user == i.prototype_project.creator or user_is_coeditor %}
+                <a href="{% url 'update_implementation_item' prototype_project.id i.id %}" class="static_a_display">
+                    <button class="btn btn-xs"><i class="fa fa-pencil"></i> edit</button>
+                </a>
+
+                <a href="{% url 'delete_implementation_item' prototype_project.id i.id %}" class="static_a_display">
+                    <button class="btn btn-xs"><i class="fa fa-close"></i> remove</button>
+                </a>
+                {% endif %}
+            </h3>
+            <p><em> {{ i.description|safe }} </em></p>
+            <p><strong>Files</strong> 
+            {% if user == i.prototype_project.creator or user_is_coeditor %}
+                <a href="{% url 'upload_info_file' i.pk %}" class="static_a_display"><button class="btn btn-xs btn-success"><i class="fa fa-plus"></i> Add A File</button></a>
+            {% endif %}
+            </p>
+            {% for file in i.implementation_files.all %}
+            <div class="media">                
+                <div class="media-left media-top">
+                    <a href="{{ file.file.url }}" target="_blank">
+                        <img class="media-object" src="{{ file.file.url }}" alt="..." width="48px">
+                    </a>
+                    
+                </div>
+                <div class="media-body">                   
+                    <a href="{% url 'delete_info_file' file.id %}" class="static_a_display">
+                        <button class="btn btn-xs"><i class="fa fa-close"></i> remove</button>
+                    </a>                    
+                </div>
+            </div>
+            {% endfor %}         
+         </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+{% endblock content_container %}

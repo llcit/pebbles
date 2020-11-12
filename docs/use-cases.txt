@@ -1,0 +1,9 @@
+Use Cases:
+
+User:
+- create project
+	a. provides 'core' metadata for project
+	b. required metatdata: title, publisher, subject
+
+- add a task
+	a. tasks are ordered/grouped by task type ()

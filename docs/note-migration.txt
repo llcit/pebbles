@@ -1,0 +1,14 @@
+migration notes
+
+Dumps the database to json file specified as redirect (not shown in command below).
+Exclusions are auth.permission and contenttypes tables. This "fixture" is used to load 
+data into new db.
+
+python manage.py dumpdata --exclude auth.permission --exclude contenttypes --indent 4 > <PATH TO OUTPUT FIXTURE FILE>
+
+To populate fresh db with fixture:
+a. create new db and specify in db settings module
+b. run migrate
+c. run loaddata command:
+
+python manage.py loaddata <PATH TO FIXTURE FILE>

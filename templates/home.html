@@ -1,0 +1,239 @@
+<!-- home.html -->
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,300,500' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700,300italic' rel='stylesheet' type='text/css'>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NFLRC PBLL Repository</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'css/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+
+    <!-- Site-wide css -->
+    <link href="{% static 'css/base.css' %}" rel="stylesheet">
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    
+    <!-- Bootstrap js -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <style type="text/css">
+        body {
+          padding-top: 10px;
+        }
+    </style>
+
+</head>
+
+<body>
+    
+    <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#rightnav" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div id="rightnav" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right navbar-panel">
+                <li><a href="{% url 'page_view' 1 %}" class="btn btn-link btn-md btn-color-flat"><i class="fa fa-info"></i> about</a></li>
+                <li><a href="{% url 'list_prototypes' %}" class="btn btn-link btn-md btn-color-flat"><i class="fa fa-list"></i> browse </a></li>
+                <li><a href="{% url 'create_prototype' %}" class="btn btn-link btn-md btn-color-flat"><i class="fa fa-plus"></i> create </a></li>
+                <li>
+                {% if not user.is_authenticated %}
+                  {# <a href="/pebbles/login/google-oauth2/"  class="btn btn-link btn-md btn-color-flat"><i class="fa fa-sign-in"></i> login </a> #}
+    
+                  <a href="{% url 'social:begin' 'google-oauth2' %}" class="static_a_display"><i class="fa fa-sign-in"></i> login</a>
+                {% else %}
+                  <a href="{% url 'logout' %}" class="btn btn-link btn-md btn-color-flat"><i class="fa fa-sign-out"></i> logout</a>
+                {% endif %}
+                </li>                    
+            </ul>
+            {% if "/search" not in request.path %}
+                <form method="get" action="{% url 'haystack_search' %}" class="navbar-form navbar-right" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search for..." name="q" value="{{query}}">
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-color-flat" type="button"><i class="fa fa-search"></i></button>
+                        </span>
+                    </div>
+                </form>            
+            {% endif %}
+        </div>
+        
+        <div class="row">
+            <div class="col-xs-2">
+                <p><img src="{% static 'img/pebbles_logo_small.jpg' %}" width="100%"></p>
+            </div>
+            <div class="col-xs-10" style="">
+                <p class="lead" style="font-size: 4.0em">Pebbles
+                <h3 class="lead" style="margin-top: -20px">Project-Based Language Learning Repository</h3>
+                </p>
+            </div>            
+        </div>
+
+        <div class="row">
+            
+            <div class="col-md-12 text-left">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-link dropdown-toggle btn-color-flat static_a_display" data-toggle="dropdown"><i class="fa fa-filter"></i> <span id="toggle-label">language</span> </button> <ul class="dropdown-menu">
+                        <li><a href="#" class="filterbtn" data-filter="*"> show all </a></li>
+                        {% for k, v in languages.items %}
+                            <li><a href="#" class="filterbtn" data-filter=".{{k.title }}"> {{ k.title }} ({{ v }}) </a></li>
+                        {% endfor %}
+                    </ul> 
+                </div>
+                <a href="#" class="sortbtn btn btn-sm btn-link btn-color-flat static_a_display" data-sort="lname"> <i class="fa fa-sort-alpha-asc"></i> author </a>
+
+                <a href="#" class="sortbtn btn btn-sm btn-link btn-color-flat static_a_display" data-sort="title"> <i class="fa fa-sort-alpha-asc"></i> title </a>
+
+                <a href="#" class="sortbtn btn btn-sm btn-link btn-color-flat static_a_display" data-sort="modified"><i class="fa fa-sort-alpha-asc"></i> modified </a>
+
+                <a href="#" class="filterbtn btn btn-sm btn-link btn-color-flat static_a_display" data-filter="*"> <i class="fa fa-refresh"></i> </a>
+
+                {% if user.is_authenticated %}
+                <div class="btn-group pull-right" role="group">
+                    <button type="button" class="btn btn-sm btn-link dropdown-toggle btn-color-flat static_a_display" data-toggle="dropdown"><i class="fa fa-folder"></i> <span id="toggle-label">your prototypes</span> </button>
+                    <ul class="dropdown-menu">
+                        {% for user_prj in prototypes_by_creator %}
+                            <li><a href="{% url 'docview_prototype' user_prj.pk %}">{{ user_prj }} </a></li>
+                        {% endfor %}
+                    </ul> 
+                </div>
+                {% endif %}
+                <hr height="2">
+            </div>
+
+            <div class="col-md-12 center-block" id="brickwall">
+
+            {% for i in prototype_featured %} 
+                <div class="well stamp {% for k in i.get_languages %} {{k.title}} {% endfor %}" data-title="{{i.title|slugify}}" data-mod="{{ i.modified|date:'Ymd h:i' }}">
+
+                    <div class="media">
+                        <h4 class="media-heading"></h4>
+                        
+                        <div class="media-left media-top">                            
+                            <p><h4>{% if i.featured_by_line %} {{ i.featured_by_line|safe }} {% else %}{% if i.icon %}<img width="64px" src="{{ i.icon.url }}">{% endif %}{% endif %}</h4></p>    
+                        </div>
+                        
+                        <div class="media-body" style="padding-right: 20px">
+                            <a href="{% url 'docview_prototype' i.id %}" class="static_a_display">                                
+                                    <h4 class="lead">{{ i.title }}</h4>
+                                    <h5>by {{ i.creator.first_name }} <span class="lname">{{ i.creator.last_name }}</span></h5>
+                                    <p>{{ i.description| truncatechars_html:340 |safe }}</p>                                
+                            </a>                           
+                        </div>
+                    </div>                
+
+                </div>
+                <p></p>                
+            {% endfor %} 
+
+            {% for i in prototype_list %}
+                <div class="brick well bs-bg-white {% for k in i.get_languages %} {{k}} {% endfor %}" data-title="{{i|slugify}}" data-mod="{{ i.modified|date:'Ymd h:i' }}">
+                    
+                    <a href="{% url 'docview_prototype' i.id %}" class="static_a_display">
+                        <div>
+                            <h2>
+                                {% if i.icon %}<div style="width: 220px"><img width="100%" src="{{ i.icon.url }}"></div>{% endif %}
+                                <h4>{{ i.title }}</h4>
+                            </h2>
+                            <h5>by {{ i.creator.first_name }} <span class="lname">{{ i.creator.last_name }}</span></h5>
+                        </div>
+                    </a>
+
+                    <p></p>
+                    <p>{{ i.description | truncatechars_html:140 | safe }}</p>
+                    
+
+                </div>
+                <p></p>
+            {% endfor %}
+
+            </div>
+        </div>
+    </div> <!-- end container -->
+
+
+    <!-- Isotope visual filtering library -->
+    <script src="{% static 'js/isotope.pkgd.min.js' %}"></script>
+
+    <!-- Packery layout library -->
+    <script src="{% static 'js/packery-mode.pkgd.min.js' %}"></script>
+
+    <script src="{% static 'js/imagesloaded.pkgd.min.js' %}"></script>
+
+    <script type="text/javascript">
+        var $container = $('#brickwall').imagesLoaded( function() {
+            // init Isotope after all images have loaded
+            $container.isotope({
+                layoutMode: 'packery',
+                
+                packery: {
+                  gutter: 10,
+                },
+
+                itemSelector: '.brick',
+
+                getSortData: {
+                    lname: '.lname',
+                    title: '[data-title]',
+                    modified: '[data-mod]',
+                },
+
+                stamp: '.stamp',
+
+                sortBy: 'title'
+
+            });
+            // $container.isotope();
+            // $container.isotope({ sortBy: 'title'});
+        });
+
+        $('.sortbtn').on('click', function() {
+            var $v = $(this).attr('data-sort');
+            var $b = $(this).children('.fa');
+            if( $b.hasClass('fa-sort-alpha-desc') ) {
+                $container.isotope({ sortBy: $v, sortAscending: false });
+                $b.toggleClass('fa-sort-alpha-desc fa-sort-alpha-asc');
+
+            } else {
+                $container.isotope({ sortBy: $v, sortAscending: true });
+                $b.toggleClass('fa-sort-alpha-desc fa-sort-alpha-asc');
+            }
+        });
+
+        $('.filterbtn').on('click', function() {
+            var $v = $(this).attr('data-filter');
+            if($v !== "*")
+                $("#toggle-label").html($v.substring(1));
+            else 
+                $("#toggle-label").html("language");
+
+            $container.isotope({ filter: $v });
+        });
+
+        $(document).ready(function() {
+            $container.isotope({ sortBy: 'modified'});
+        });
+
+        // $container.isotope('layout');
+
+        
+
+    </script>
+
+</body>

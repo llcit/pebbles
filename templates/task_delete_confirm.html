@@ -1,0 +1,19 @@
+<!-- task_delete_confirm.html -->
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content_container %}
+
+<div class="row"><div class="col-md-8 col-md-offset-2 block-center">
+    <p class="lead">
+        <form method="post" action=".">{% csrf_token %}
+            <p class="lead well" style="background: orange">
+                This action will permanently remove <strong>{{ project_task }}</strong> from the <strong>{{ project_task.prototype_project }}</strong> project.
+            </p>
+            <button type="submit" class="btn btn-lg btn-danger">Yes, I want to permanently delete task {{ project_task }} now!</button>
+        </form>
+    </p>
+</div></div>
+
+
+{% endblock content_container %}

@@ -1,0 +1,295 @@
+<!-- project_prototype_doc.html -->
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block meta_block %}
+    <meta property="og:title" content="NFLRC Project-Based Language Learning Repository" />
+    <meta property="og:description" content="{{ project_prototype.title }}" />
+    <meta property="og:image" content="{% if project_prototype.icon %}{{ project_prototype.icon.url }} {% else %} http://nflrc.hawaii.edu/static/nflrc-pbllrepo/img/pebbles_logo_small.jpg{% endif %}" />
+    <meta property="og:url" content="http://nflrc.hawaii.edu{{ request.path }}" />
+{% endblock meta_block %}
+
+{% block socialplugs %}
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=849311455108932&version=v2.0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+{% endblock socialplugs %}
+
+{% block content_container %}
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <!-- PROJECT HEAD -->
+        <p>
+            <h1>
+                {{ project_prototype.title }}
+                <small>
+                    <a href="{% url 'view_prototype' project_prototype.id %}" class="static_a_display">
+                        <button class="btn btn-xs"><i class="fa fa-info"></i> info </i></button>
+                    </a>
+                    {% if project_prototype.creator == user %}
+                    <a href="{% url 'update_prototype' project_prototype.id %}" class="static_a_display">
+                        <button class="btn btn-xs"><i class="fa fa-pencil"></i> edit</button>
+                    </a>
+
+                        {% if not project_prototype.flips.all %}
+                        <a href="{% url 'delete_prototype' project_prototype.id %}" class="static_a_display">
+                            <button class="btn btn-xs"><i class="fa fa-close"></i> remove</button>
+                        </a>
+                        {% else %}
+                        <a href="" class="static_a_display">
+                            <button class="btn btn-xs"><i class="fa fa-close"></i> Cannot remove because there are multiple derivations</button>
+                        </a>
+                        {% endif %}
+                    {% endif %}
+                </small>
+            </h1>
+
+            <p>
+                <h4>A Project Prototype by {{ project_prototype.creator.first_name }} {{ project_prototype.creator.last_name }}</h4>
+                <small>{% if project_prototype.publish_date %} published on {{ project_prototype.publish_date|date:"M j, Y"}} {% else %} not published {% endif %}</small>
+            </p>
+
+            {% if project_prototype.origin %}
+            <p><small>based on</small> <a href="{% url 'view_prototype' project_prototype.origin.id %}">{{ project_prototype.origin.title }}</a></p>
+            {% endif %}
+            <p>
+                <!-- Go to www.addthis.com/dashboard to customize your tools -->
+                <div class="addthis_sharing_toolbox"></div>
+            </p>
+
+        </p>
+        <!-- END PROJECT HEAD -->
+
+        <!-- PROJECT MAIN BODY -->
+        <p>
+            <dl>
+                <!-- PROJECT DESCRIPTION -->
+                <dt id="project_description" class="lead">{% comment %}<h2>Project Description</h2>{% endcomment %}</dt>
+                <dd>{{ description|safe}}</dd>
+            </dl>
+            
+            <dl>
+
+                <!-- PROJECT SEQUENCE OVERVIEW TABLE OF CONTENTS -->
+                <dt id="project_sequence" class="lead">
+                    <h2>Overview 
+                        <small><a href="#files" class="static_a_display btn btn-link"><i class="fa fa-file"></i> files</a> 
+                        <a href="#comments" class="static_a_display btn btn-link"><i class="fa fa-comment"></i> comments</a></small>
+                    </h3>
+                </dt>
+                <dd>
+                    <div class="row">
+                    {% for category, tasks in tasks.items %}
+                        <div class="col-md-2">
+                            <h4> 
+                                {% if not tasks %}<i class="fa fa-square-o"></i>
+                                {% else %}<i class="fa fa-check-square"></i>{% endif %}
+                                <a href="#{{ category|slugify }}" class="static_a_display">{{ category }}</a>
+                            </h4>
+                            {% for task in tasks %}
+                                <p class="text-muted"> {{ task.title }}</p>
+                            {% empty %}
+                                <p class="small"><i class="fa fa-warning" style="font-color: black; color: #ffcd42"></i>Tasks not specified.</p>
+                            {% endfor %}
+                        </div>
+                                                       
+                    {% endfor %}
+                        <div class="col-md-3">
+                            <h4>
+                                <a href="#info_items" class="static_a_display">Implementation Info</a>
+                            </h4>
+                            {% for info in implementation_info_items %}
+                                <p>{{ info.title }}</p>
+                            {% empty %}
+                                <p class="small">Implementation information not specified.</p>
+                            {% endfor %}
+                        </div>                        
+                    </div>
+                </dd>
+                
+                <h5></h5>
+
+
+                <!-- PROJECT TASKS DETAIL -->
+                {% for category, tasks in tasks.items %}
+                    <h1 id="{{ category|slugify }}"></h1>
+                    
+                    <dt><h2>
+                        {% if not tasks %}<i class="fa fa-square-o fa-0"></i>
+                        {% else %}<i class="fa fa-check-square fa-0"></i>{% endif %}
+                        {{ category }}
+                        {% if project_prototype.creator == user %}
+                        <a href="{% url 'create_task' project_prototype.id %}?cat={{ tasks.0.task_category }}" class="static_a_display">
+                            <button class="btn btn-xs"><i class="fa fa-plus"></i> add task</button>
+                        </a>
+                        {% endif %}
+                    </h2></dt>
+                    <dd class="well" style="background: #fff; border: None">
+                        {% for task in tasks %}
+                            <p>
+                                <h4>
+                                    {{ task }}
+                                    <small>
+                                    {% if project_prototype.creator == user %}
+                                    <a href="{% url 'update_task' task.prototype_project.id task.id %}" class="static_a_display">
+                                        <button class="btn btn-xs"><i class="fa fa-pencil"></i> edit</button>
+                                    </a>
+
+                                    <a href="{% url 'delete_task' task.prototype_project.id task.id %}" class="static_a_display pull-right">
+                                        <button class="btn btn-xs"><i class="fa fa-close"></i> remove</button>
+                                    </a>
+                                    {% endif %}
+                                    </small>
+
+                                </h4>
+                                <p>{{ task.description|safe }}</p>
+                                
+                                {% if task.technology_tips %}<h5>Technology Tips</h5><p>{{ task.technology_tips|safe }}</p>{% endif %}
+                                {% if task.task_extension %}<h5>Task Extension</h5><p>{{ task.task_extension|safe }}</p>{% endif %}
+                            </p>
+                        {% endfor %}
+                    </dd>
+                {% endfor %}
+
+            </dl>
+
+        </p>
+        <!-- END PROJECT MAIN BODY -->
+
+    </div>
+
+    <!-- PROJECT IMPLEMENTATION INFORMATION -->
+    <div id="info_items" class="col-md-8 col-md-offset-2">
+        <h1>Implementation Info 
+            {% if project_prototype.creator == user %}
+            <a href="{% url 'create_implementation_item' project_prototype.id %}" class="static_a_display">
+                <button class="btn btn-xs"><i class="fa fa-plus"></i> add information item</button>
+            </a>
+            {% endif %}
+        </h1>
+        
+        {% for info_item in implementation_info_items %} 
+            <div class="well" style="background: #fff; border: none">
+                <h4>
+                    <span>{{ info_item }}
+                    <small>
+                    {% if project_prototype.creator == user or user.is_staff %}
+                    <a href="{% url 'update_implementation_item' project_prototype.id info_item.id %}" class="static_a_display">
+                        <button class="btn btn-xs"><i class="fa fa-pencil"></i> edit</button>
+                    </a>
+
+                    <a href="{% url 'delete_implementation_item' project_prototype.id info_item.id %}" class="static_a_display pull-right">
+                        <button class="btn btn-xs"><i class="fa fa-close"></i> remove</button>
+                    </a>
+                    {% endif %}
+                    </small>
+                </h4>
+                <p>{{ info_item.description|safe }}</p>
+            </div>
+        {% endfor %}
+
+    </div>
+
+
+    <!-- PROJECT FILES -->
+    <div id="files" class="col-md-8 col-md-offset-2">
+        <h2>Files</h2>
+        {% for file in filelisting %}{% if file.file %}
+        <div class="media">
+            <div class="media-left media-top">
+                {% if file.file and file.file.url %}<i class="fa fa-file-o"></i>{% endif %}
+            </div>
+            <div class="media-body">
+          
+                {% if file.file and file.file.url %}
+                <h5 class="media-heading">
+                    <a href="" class="static_a_display btn btn-xs bg-default" data-toggle="modal" data-target="#{{file.id}}_link_display"><i class="fa fa-clipboard"></i> copy/insert link</a>
+                    <a href="{{ file.file.url }}" target="_blank">{{ file.file.url }}</a>
+                    {% if project_prototype.creator == user or user.is_staff %}
+                        <a href="{% url 'delete_file' file.id %}" class="static_a_display btn btn-xs pull-right bg-danger"><i class="fa fa-close"></i> remove</a>
+                    {% endif %}
+
+                </h5>
+                {% endif %}
+                
+                <div>
+                    
+                <!-- Button trigger modal -->
+                    
+
+                <!-- Modal -->
+                    <div class="modal fade" id="{{file.id}}_link_display" tabindex="-1" role="dialog" aria-labelledby="link_title" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="link_title">Click, copy, and paste  </h4>
+                          </div>
+                          <div class="modal-body" editable="true">
+                                {% if file.file and file.file.url %}<input type="text" name="text_area" size="40" value="{{ file.file.url }}" onClick="javascript:this.focus();this.select();">{% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                <!-- End Modal -->
+                </div>
+
+
+            </div>
+        </div>{% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- COMMENTS -->
+    <div id="comments" class="col-md-8 col-md-offset-2">
+        <h2>Comments</h2>
+        {% if user.is_authenticated %}
+        <!-- comment post form -->
+        <div class="well" style="background: #fff; border: None">
+            <form id="{{project_prototype.id}}-postform" class="postform" action="{% url 'create_post'%}" method="post" data-reply_target="{{project_prototype.id}}-replies">{% csrf_token %}
+                {{ postform|crispy }}
+                <p></p>
+
+                <div style="text-align: right"><input id="post_submit_btn" type="submit" class="btn btn-success btn-sm btn-block" value="Add Post"/></div>
+            </form>
+        </div>
+        {% endif %}
+
+        <dl id="{{project_prototype.id}}-replies" class="reply-block">
+        {% for j in comments  %}
+            <div id="post_{{j.id}}" class="well" style="margin-left: 30px; {% if j in new_replies %} background: #FFCC99 {% else %} background: #fff {% endif %}">
+                <dt>
+
+                    {{ j.subject }}
+
+                    {% if user.is_staff or user == j.creator %}<small style="float: right">&nbsp;<a href="{% url 'edit_post' j.id %}" class="btn btn-primary btn-xs">edit</a>&nbsp;</small>{% endif %}
+                    <small class="pull-right"> {{ j.modified|date:"M j Y" }} </small>
+                    <br><small> by {% if user == j.creator %}me{% else %}{{ j.creator.first_name }} {{ j.creator.last_name }} {% endif %}</small>
+                </dt>
+                <dd>{{ j.text | safe }}</dd>
+                <div style="text-align: right">
+                    {% if user.is_staff or user == j.creator %}
+                        <form class="post_delete" method="post" data-reply-target="post_{{j.id}}" action="{% url 'delete_post' %}">{% csrf_token %}
+                            <input type="hidden" name="post" value="{{ j.id }}"/>
+                            <input type="submit" class="btn btn-xs btn-yield" title="Delete this post?" value="remove"/>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+        </dl>
+    </div>
+</div>
+
+
+{% endblock content_container %}
+
+{% block js_include %}<script src="{% static 'js/comments.js' %}"></script>{% endblock js_include %}
+
