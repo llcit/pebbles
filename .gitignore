@@ -143,3 +143,5 @@ cython_debug/
 *.sqlite3
 
 .IDEA/
+
+/pbllrepo_index
