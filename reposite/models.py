@@ -124,7 +124,7 @@ class ProjectPrototype(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('view_prototype', args=[self.id])
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
@@ -203,7 +203,7 @@ class ProjectTask(models.Model):
     def get_absolute_url(self):
         return reverse('view_task', args=[self.prototype_project.id, self.id])
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
@@ -217,7 +217,7 @@ class ProjectComment(models.Model):
     class Meta:
         verbose_name = 'Project / Discussion Pair'
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s --> %s' % (self.project, self.thread)
 
 
@@ -236,7 +236,7 @@ class ProjectImplementationInfo(models.Model):
     def get_absolute_url(self):
         return reverse('view_implementation_item', args=[self.prototype_project.id, self.id])
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
@@ -267,7 +267,7 @@ class RepoPage(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('page_view', args=[str(self.id)])
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
