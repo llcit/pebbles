@@ -31,7 +31,7 @@
                 {{ project_prototype.title }}
                 <small>
                     <a href="{% url 'view_prototype' project_prototype.id %}" class="static_a_display">
-                        <button class="btn btn-xs"><i class="fa fa-info"></i> info </i></button>
+                        <button class="btn btn-xs"><i class="fa fa-info"></i> detail </i></button>
                     </a>
                     {% if project_prototype.creator == user %}
                     <a href="{% url 'update_prototype' project_prototype.id %}" class="static_a_display">
@@ -131,11 +131,11 @@
                         </a>
                         {% endif %}
                     </h2></dt>
-                    <dd class="well" style="background: #fff; border: None">
+                    <dd class="" style="background: #fff; border: None">
                         {% for task in tasks %}
                             <p>
                                 <h4>
-                                    {{ task }}
+                                    <i class="fa fa-square fa-0" style="color: #d3d3d3;"></i> {{ task }}
                                     <small>
                                     {% if project_prototype.creator == user %}
                                     <a href="{% url 'update_task' task.prototype_project.id task.id %}" class="static_a_display">
@@ -150,9 +150,14 @@
 
                                 </h4>
                                 <p>{{ task.description|safe }}</p>
-                                
-                                {% if task.technology_tips %}<h5>Technology Tips</h5><p>{{ task.technology_tips|safe }}</p>{% endif %}
-                                {% if task.task_extension %}<h5>Task Extension</h5><p>{{ task.task_extension|safe }}</p>{% endif %}
+                                <dl class="dl-horizontal"> <small> 
+                                {% if task.task_type %}<dt>Task Type:</dt> <dd>{{ task.task_type }} </dd>{% endif %}
+                                {% if task.task_focus %}<dt>Task Focus:</dt> <dd>{{ task.task_focus|safe }} </dd>{% endif %}
+                                {% if task.task_time %}<dt>Task Time:</dt> <dd>{{ task.task_time }} </dd>{% endif %}
+                                {% if task.task_extension %}<dt>Task Extension:</dt> <dd>{{ task.task_extension|safe }} </dd>{% endif %}
+                                {% if task.technology_tips %}<dt>Technology Tips:</dt> <dd>{{ task.technology_tips|safe }} </dd>{% endif %}
+                                {% if task.potential_hurdles %}<dt>Potential Hurdles:</dt> <dd>{{ task.potential_hurdles|safe }} </dd>{% endif %}
+                                </small></dl>
                             </p>
                         {% endfor %}
                     </dd>

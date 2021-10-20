@@ -251,7 +251,7 @@ class ProjectTaskListView(LoginRequiredMixin, DetailView):
         return context
 
 
-class ProjectTaskDetailView(LoginRequiredMixin, ListUserFilesMixin, DetailView):
+class ProjectTaskDetailView(ListUserFilesMixin, DetailView):
     model = ProjectTask
     template_name = 'task_detail.html'
     context_object_name = 'project_task'

@@ -81,7 +81,7 @@
                 {% if i.task_type %}<dt>Task Type:</dt> <dd>{{ i.task_type }} </dd>{% endif %}
                 {% if i.task_focus %}<dt>Task Focus:</dt> <dd>{{ i.task_focus|safe }} </dd>{% endif %}
                 {% if i.task_time %}<dt>Task Time:</dt> <dd>{{ i.task_time }} </dd>{% endif %}
-                {% if i.task_extensions %}<dt>Task Extension:</dt> <dd>{{ i.task_extensions|safe }} </dd>{% endif %}
+                {% if i.task_extension %}<dt>Task Extension:</dt> <dd>{{ i.task_extension|safe }} </dd>{% endif %}
                 {% if i.technology_tips %}<dt>Technology Tips:</dt> <dd>{{ i.technology_tips|safe }} </dd>{% endif %}
                 {% if i.potential_hurdles %}<dt>Potential Hurdles:</dt> <dd>{{ i.potential_hurdles|safe }} </dd>{% endif %}
             </dl>
@@ -99,9 +99,11 @@
                     </a>                    
                 </div>
                 <div class="media-body">                   
+                    {% if user == i.prototype_project.creator or user_is_coeditor %}
                     <a href="{% url 'delete_task_file' file.id %}" class="static_a_display">
                         <button type="button" class="btn btn btn-xs"><i class="fa fa-close"></i> remove</button>
-                    </a>                    
+                    </a>
+                    {% endif %}                 
                 </div>
             </div>
             {% endfor %}  
