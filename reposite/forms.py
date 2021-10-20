@@ -155,7 +155,7 @@ class TaskCreateForm(forms.ModelForm):
         model = ProjectTask
         fields = ('title', 'prototype_project', 'short_description', 'description', 'task_category', 'sequence_order', 'task_type', 'task_focus', 'task_time', 'technology_tips',
                   'task_extension', 'potential_hurdles')
-        labels = {'title': 'Task Title'}
+        labels = {'title': 'Task Title', 'sequence_order': 'Order of this task within its category'}
         widgets = {
             'prototype_project': forms.HiddenInput(),
             'short_description': forms.Textarea(attrs={'rows': '2'}),
@@ -175,7 +175,7 @@ class TaskUpdateForm(forms.ModelForm):
         model = ProjectTask
         fields = ('title', 'prototype_project', 'short_description', 'description', 'task_category', 'sequence_order', 'task_type', 'task_focus', 'task_time', 'technology_tips',
                   'task_extension', 'potential_hurdles')
-        labels = {'title': 'Task Title'}
+        labels = {'title': 'Task Title', 'sequence_order': 'Order of this task within its category'}
         widgets = {
             'prototype_project': forms.HiddenInput(),
             'short_description': forms.Textarea(attrs={'rows': '2'}),
