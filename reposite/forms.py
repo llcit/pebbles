@@ -155,7 +155,8 @@ class TaskCreateForm(forms.ModelForm):
         model = ProjectTask
         fields = ('title', 'prototype_project', 'short_description', 'description', 'task_category', 'sequence_order', 'task_type', 'task_focus', 'task_time', 'technology_tips',
                   'task_extension', 'potential_hurdles')
-        labels = {'title': 'Task Title', 'sequence_order': 'Order of this task within its category'}
+        labels = {'title': 'Task Title', 'sequence_order': 'Order of this task within the category specified above.'}
+        help_texts = {'sequence_order': 'Suggestion: use nonconsecutive numbers, such as 0, 4, 7, 9 to leave room for additional items later.'}
         widgets = {
             'prototype_project': forms.HiddenInput(),
             'short_description': forms.Textarea(attrs={'rows': '2'}),
@@ -175,8 +176,10 @@ class TaskUpdateForm(forms.ModelForm):
         model = ProjectTask
         fields = ('title', 'prototype_project', 'short_description', 'description', 'task_category', 'sequence_order', 'task_type', 'task_focus', 'task_time', 'technology_tips',
                   'task_extension', 'potential_hurdles')
-        labels = {'title': 'Task Title', 'sequence_order': 'Order of this task within its category'}
+        labels = {'title': 'Task Title', 'sequence_order': 'Order of this task within the category specified above.'}
+        help_texts = {'sequence_order': 'Suggestion: use nonconsecutive numbers, such as 0, 4, 7, 9 to leave room for additional items later.'}
         widgets = {
+            # 'sequence_order': forms.NumberInput(attrs={'class': '', 'data-trigger': 'click', 'data-container':'body', 'data-toggle':'popover', 'data-placement':'top', 'data-content':'Vivamus sagittis lacus vel augue laoreet rutrum faucibus.'}),
             'prototype_project': forms.HiddenInput(),
             'short_description': forms.Textarea(attrs={'rows': '2'}),
             'description': forms.Textarea(attrs={'class': 'form-control content-editor', 'rows': '3'}),

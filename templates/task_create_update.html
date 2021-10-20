@@ -62,6 +62,10 @@
         $(".savebtn").on("click", function(e) {
             $("#taskform").submit()
         });
+
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
     });
 </script>
 {% endblock js_include %}
