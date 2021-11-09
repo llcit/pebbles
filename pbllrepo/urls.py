@@ -97,6 +97,9 @@ urlpatterns = [
     url(r'^search/', SearchHaystackView.as_view(), name='haystack_search'),
     url(r'^update_index/$', UpdateIndexView.as_view(), name='haystack_update_index'),
 
+    # manual login
+    url(r'^bdx/$', auth_view.login, name='login'),
+
     # administration
     url(r'^logout/$', auth_view.logout, name='logout'),
     url(r'^admin/filebrowser/', include(site.urls)),
